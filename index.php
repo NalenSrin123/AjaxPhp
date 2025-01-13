@@ -47,8 +47,8 @@
                                 <img width="80px" src="./Image/'.$row['profile'].'" alt="">
                             </td>
                             <td>
-                                <button class="btn btn-warning me-1">Edit</button>
-                                <button class="btn btn-danger">Delete</button>
+                                <button type="button" class="btn btn-warning me-1" id="btnEdit">Edit</button>
+                                <button type="button" class="btn btn-danger" id="delete">Delete</button>
                             </td>
                         </tr>';
                     }
@@ -58,7 +58,8 @@
     </div>
     <div class="modals">
         <form action="" method="post" enctype="multipart/form-data">
-            <h3 class="text-center">Add Employee</h3>
+            <h3 class="text-center" id="title"></h3>
+            <input type="text" name="hide_id" id="hide_id">
             <div class="form-group">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" name="name" id="name" class="form-control">
@@ -98,10 +99,11 @@
                 <label for="profile" class="form-label">Profile</label>
                 <input type="file" name="profile" id="profile" class="form-control d-none"> <br>
                 <img id="image" style="cursor: pointer;" width="100px" src="https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE=" alt="">
-               <input type="text" name="" id="images" class="d-none">
+               <input type="text" name="" id="images" class="d-block">
             </div>
             <div class="form-group d-flex justify-content-end">
                 <button type="button" class="btn btn-primary mt-4 me-2" id="btnSave">Save</button>
+                <button type="button" class="btn btn-success mt-4 me-2" id="edit">Edit</button>
                 <button class="btn btn-danger mt-4" id="btnCancel">Cancel</button>
             </div>
         </form>
@@ -110,8 +112,24 @@
 </html>
 <script>
     $(document).ready(function(){
+        function clearForm(){
+            $('#name').val('');
+            if($('#sex').val()!="Male"){
+                $('#sex').val('Male');
+            }  
+            if($('#position').val()!='Web Front-end'){
+                $('#position').val('Web Front-end');
+            }
+            $('#salary').val('');
+            $('#rate').val('');
+            $('#hour').val('');
+        }
         $('#addEmp').click(function(){
             $('.modals').fadeIn();
+            clearForm()
+            $('#edit').hide();
+            $('#btnSave').show();
+            $('#title').html('Add Employee');
         })
         $('#btnCancel').click(function(){
             $('.modals').fadeOut();
@@ -174,13 +192,95 @@
                                 <img width="80px" src="./Image/${profile}" alt="">
                             </td>
                             <td>
-                                <button class="btn btn-warning me-1">Edit</button>
+                                <button class="btn btn-warning me-1" id="btnEdit" >Edit</button>
                                 <button class="btn btn-danger">Delete</button>
                             </td>
                         </tr>
                     `);
                } 
             })
-        })      
+            $('#image').attr('src','https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE=')
+        }) 
+        $(document).on('click','#delete',function(){
+            const tr=$(this).parents('tr')
+            const id=tr.find('td').eq(0).text();
+            $.ajax({
+                url:"delete.php",
+                method:'post',
+                data:{
+                    emp_id:id
+                },
+                cache:false,
+                success:function(respone){
+                   tr.remove();
+                }
+            })
+        })
+        //Update
+        $(document).on('click','#btnEdit',function(){
+            $('.modals').fadeIn();
+            clearForm();
+            $('#btnSave').hide();
+            $('#edit').show();
+            $('#title').html('Edit Employee');
+            const tr=$(this).parents('tr');
+           
+            
+            //get data from table
+            const id=tr.find('td').eq(0).text();
+            const name=tr.find('td').eq(1).text();
+            const sex=tr.find('td').eq(2).text();
+            const position=tr.find('td').eq(3).text();
+            const salary=tr.find('td').eq(4).text()
+            const rate=tr.find('td').eq(5).text()
+            const hour=tr.find('td').eq(6).text()
+            const profile=tr.find('img').attr('src');
+            const profileName=profile.split('/').pop();
+            //insert data that get from table into form
+            $('#hide_id').val(id);
+            $('#name').val(name);
+            $('#sex').val(sex); 
+            $('#position').val(position);
+            $('#salary').val(salary);
+            $('#rate').val(rate);
+            $('#hour').val(hour);
+            $('#image').attr('src','./Image/'+profileName);
+            $('#images').val(profileName);
+             //get data from form
+            const emps_id=$('#hide_id').val() 
+            const emps_name=$('#name').val();
+            const emps_sex=$('#sex').val();
+            const emps_position=$('#position').val();
+            const emps_salary=$('#salary').val();
+            const emps_rate=$('#rate').val();
+            const emps_hour=$('#hour').val();
+            const emps_profile=$('#images').val();
+            const emps_income=Number(emps_salary)+Number(emps_rate*emps_hour);
+
+
+            $('#edit').click(function(){
+                $.ajax({
+                    url:'update.php',
+                    method:'post',
+                    data:{
+                        id:emps_id,
+                        name:emps_name,
+                        sex:emps_sex,
+                        position:emps_position,
+                        salary:emps_salary,
+                        rate:emps_rate,
+                        hour:emps_hour,
+                        income:emps_income,
+                        profile:emps_profile
+                    },
+                    cache:false,
+                    success:function(respone){
+                    console.log(respone);
+                    
+                    
+                    }
+                })
+            })
+        });     
     })
 </script>
