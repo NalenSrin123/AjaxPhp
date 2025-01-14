@@ -13,8 +13,9 @@ global $connection;
     $profile=$_POST['profile'];
     $update_at=date('ymd');
     
-    $sql="UPDATE `employee` SET `name`='$name',`sex`='$sex',`position`='$position',
-    `salary`='$salary',`rate`='$rate',`hour`='$hour',`income`='$income',`profile`='$profile',`update_at`='$update_at' WHERE `employee_id`='$id'";
-    $connection->query($sql);
-    echo $id;
+    $sql="UPDATE `employee` SET `name`='$name',`sex`='$sex',`position`='$position',`salary`='$salary',`rate`='$rate',`hour`='$hour'
+    ,`income`='$income', `profile`='$profile' ,`update_at`='$update_at' WHERE `employee_id`='$id';";
+    $res=$connection->query($sql);
+    
+    echo $res;
 ?>

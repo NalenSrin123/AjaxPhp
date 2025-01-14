@@ -59,7 +59,7 @@
     <div class="modals">
         <form action="" method="post" enctype="multipart/form-data">
             <h3 class="text-center" id="title"></h3>
-            <input type="text" name="hide_id" id="hide_id">
+            <input type="text" name="hide_id" id="hide_id" class="d-none">
             <div class="form-group">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" name="name" id="name" class="form-control">
@@ -99,7 +99,7 @@
                 <label for="profile" class="form-label">Profile</label>
                 <input type="file" name="profile" id="profile" class="form-control d-none"> <br>
                 <img id="image" style="cursor: pointer;" width="100px" src="https://media.istockphoto.com/id/1324356458/vector/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=ZmXO4mSgNDPzDRX-F8OKCfmMqqHpqMV6jiNi00Ye7rE=" alt="">
-               <input type="text" name="" id="images" class="d-block">
+               <input type="text" name="" id="images" class="d-none">
             </div>
             <div class="form-group d-flex justify-content-end">
                 <button type="button" class="btn btn-primary mt-4 me-2" id="btnSave">Save</button>
@@ -192,8 +192,8 @@
                                 <img width="80px" src="./Image/${profile}" alt="">
                             </td>
                             <td>
-                                <button class="btn btn-warning me-1" id="btnEdit" >Edit</button>
-                                <button class="btn btn-danger">Delete</button>
+                                <button class="btn btn-warning me-1"  id="btnEdit">Edit</button>
+                                <button class="btn btn-danger" id="delete">Delete</button>
                             </td>
                         </tr>
                     `);
@@ -224,8 +224,6 @@
             $('#edit').show();
             $('#title').html('Edit Employee');
             const tr=$(this).parents('tr');
-           
-            
             //get data from table
             const id=tr.find('td').eq(0).text();
             const name=tr.find('td').eq(1).text();
@@ -247,7 +245,10 @@
             $('#image').attr('src','./Image/'+profileName);
             $('#images').val(profileName);
              //get data from form
-            const emps_id=$('#hide_id').val() 
+           
+
+            $('#edit').click(function(){
+             const emps_id=$('#hide_id').val() 
             const emps_name=$('#name').val();
             const emps_sex=$('#sex').val();
             const emps_position=$('#position').val();
@@ -256,9 +257,6 @@
             const emps_hour=$('#hour').val();
             const emps_profile=$('#images').val();
             const emps_income=Number(emps_salary)+Number(emps_rate*emps_hour);
-
-
-            $('#edit').click(function(){
                 $.ajax({
                     url:'update.php',
                     method:'post',
@@ -275,11 +273,30 @@
                     },
                     cache:false,
                     success:function(respone){
-                    console.log(respone);
-                    
-                    
+                        if(respone){
+                           tr.html(`
+                
+                                <td>${emps_id}</td>
+                                <td>${emps_name}</td>
+                                <td>${emps_sex}</td>
+                                <td>${emps_position}</td>
+                                <td>${emps_salary}</td>
+                                <td>${emps_rate}</td>
+                                <td>${emps_hour}</td>
+                                <td>${emps_income}</td>
+                                <td>
+                                    <img width="80px" src="./Image/${emps_profile}" alt="">
+                                </td>
+                                <td>
+                                    <button class="btn btn-warning me-1"  id="btnEdit">Edit</button>
+                                    <button class="btn btn-danger" id="delete">Delete</button>
+                                </td>
+                       
+                           `); 
+                        }
                     }
                 })
+                $('.modals').fadeOut();
             })
         });     
     })
